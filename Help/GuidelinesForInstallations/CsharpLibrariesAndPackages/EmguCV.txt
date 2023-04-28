@@ -1,0 +1,1 @@
+Install Emgu.CV.runtime.windows by following this guideline: https://www.emgu.com/wiki/index.php/Download_And_Installation

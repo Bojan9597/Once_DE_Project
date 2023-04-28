@@ -1,0 +1,3 @@
+https://gist.github.com/stephenhouser/c0ecaacedc14cbe62502ec123a812e12 -- Controlling AXIS Pan/Tilt/Zoom-Web Camera
+https://pyimagesearch.com/2015/03/09/capturing-mouse-click-events-with-python-and-opencv/ -- Capturing Mouse click events with Python and OpenCV
+https://github.com/Bojan9597/Once_DE_Project -- Project Folder
