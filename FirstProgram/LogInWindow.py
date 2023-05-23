@@ -52,7 +52,7 @@ class LoginWindow(QWidget):
         # Create the login button for the second column
         login_button2 = QPushButton("Log In")
         login_button2.clicked.connect(lambda: self.login_clicked("2"))
-
+                                                                      
         # Add widgets to the grid layout for the first column
         grid.addWidget(username_label1, 0, 0)
         grid.addWidget(username_textbox1, 0, 1)
@@ -88,4 +88,8 @@ class LoginWindow(QWidget):
         self.findChild(QLineEdit, f"username{source}").clear()
         self.findChild(QLineEdit, f"password{source}").clear()
         self.findChild(QLineEdit, f"ip_address{source}").clear()
+        with open("CoordinatesPTZ.txt", "w") as f:
+            f.write("")
+        with open("CoordinatesWA.txt", "w") as f:
+            f.write("")
 
