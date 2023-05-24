@@ -1,4 +1,5 @@
 import cv2
+import PyQt5
 
 # Open a video capture object
 cap = cv2.VideoCapture(0)

@@ -21,8 +21,8 @@ class CoordinatesCalculator:
         return x, y
 
     def calculate_corresponding_coordinate(self, x, y):
-        src_points = np.array(self.coordinates1, dtype=np.float32)
-        dst_points = np.array(self.coordinates2, dtype=np.float32)
+        dst_points = np.array(self.coordinates1, dtype=np.float32)
+        src_points = np.array(self.coordinates2, dtype=np.float32)
 
         # Check if there are enough coordinates for the transformation
         if len(src_points) < 4 or len(dst_points) < 4:
