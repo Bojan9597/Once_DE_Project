@@ -5,6 +5,8 @@ import time
 from PyQt5.QtWidgets import QMessageBox
 
 class Ptz_Handler:
+    requestAbsolute = ""
+    request = ""
     def get_position(self,MainWindow, ptz, media_profile):
         # Get the PTZ position using the ONVIF camera
         try:
@@ -36,12 +38,24 @@ class Ptz_Handler:
 
         # Get PTZ configuration options for getting continuous move range
         self.request = MainWindow.ptz.create_type('GetConfigurationOptions')
+        self.requestAbsolute = MainWindow.ptz.create_type('GetConfigurationOptions')
         self.request.ConfigurationToken = MainWindow.media_profile.PTZConfiguration.token
+        self.requestAbsolute.ConfigurationToken = MainWindow.media_profile.PTZConfiguration.token
         ptz_configuration_options = MainWindow.ptz.GetConfigurationOptions(self.request)
+        ptz_configuration_options_absolute = MainWindow.ptz.GetConfigurationOptions(self.requestAbsolute)
+
 
         self.request = MainWindow.ptz.create_type('ContinuousMove')
+        self.requestAbsolute = MainWindow.ptz.create_type('AbsoluteMove')
         self.request.ProfileToken = MainWindow.media_profile.token
+        self.requestAbsolute.ProfileToken = MainWindow.media_profile.token
         MainWindow.ptz.Stop({'ProfileToken': MainWindow.media_profile.token})
+        if  self.requestAbsolute.Position is None:
+            self.requestAbsolute.Position = MainWindow.ptz.GetStatus({'ProfileToken': MainWindow.media_profile.token}).Position
+            self.requestAbsolute.Position.PanTilt.space = \
+            ptz_configuration_options_absolute.Spaces.AbsolutePanTiltPositionSpace[0].URI
+            self.requestAbsolute.Position.Zoom.space = \
+            ptz_configuration_options_absolute.Spaces.AbsoluteZoomPositionSpace[0].URI
 
         if self.request.Velocity is None:
             self.request.Velocity = MainWindow.ptz.GetStatus({'ProfileToken': MainWindow.media_profile.token}).Position
@@ -114,7 +128,7 @@ class Ptz_Handler:
                     txt.write("%.2f\t--\t%s\n" % (t, ">"))
                     txt.flush()
             if key == "+":  # p
-                self.zoom_up(MainWindow, MainWindow.ptz)
+                self.zoom_up(MainWindow.ptz)
                 print(self.get_position(MainWindow ,MainWindow.ptz, MainWindow.media_profile))
                 if txt is None:
                     print("+")
@@ -122,7 +136,7 @@ class Ptz_Handler:
                     txt.write("%.2f\t--\t%s\n" % (t, "+"))
                     txt.flush()
             if key == "-":  # m
-                self.zoom_down(MainWindow, MainWindow.ptz)
+                self.zoom_down(MainWindow.ptz)
                 print(self.get_position(MainWindow ,MainWindow.ptz, MainWindow.media_profile))
                 if txt is None:
                     print("-")
@@ -141,7 +155,7 @@ class Ptz_Handler:
             if key in PRESSED:
                 PRESSED.remove(key)
                 if len(PRESSED) == 0:
-                    self.stop_move(MainWindow, MainWindow.ptz)
+                    self.stop_move(MainWindow.ptz)
                     if txt is None:
                         print("x")
                     else:
@@ -185,21 +199,21 @@ class Ptz_Handler:
         ptz.ContinuousMove(self.request)
 
 
-    def zoom_up(self, MainWindow, ptz):
+    def zoom_up(self, ptz):
         self.request.Velocity.Zoom.x = 1
         self.request.Velocity.PanTilt.x = 0
         self.request.Velocity.PanTilt.y = 0
         ptz.ContinuousMove(self.request)
 
 
-    def zoom_down(self, MainWindow, ptz):
+    def zoom_down(self, ptz):
         self.request.Velocity.Zoom.x = -1
         self.request.Velocity.PanTilt.x = 0
         self.request.Velocity.PanTilt.y = 0
         ptz.ContinuousMove(self.request)
 
 
-    def stop_move(self, MainWindow, ptz):
+    def stop_move(self, ptz):
         ptz.Stop({'ProfileToken': self.request.ProfileToken})
 
     def displayErrorMessage(self, message):
@@ -208,3 +222,12 @@ class Ptz_Handler:
         msgBox.setWindowTitle("Error")
         msgBox.setText(message)
         msgBox.exec_()
+    def move_to_position(self, ptz, x, y):
+        try:
+            # set position to x, y
+            self.requestAbsolute.Position.PanTilt.x = x
+            self.requestAbsolute.Position.PanTilt.y = y
+
+            ptz.AbsoluteMove(self.requestAbsolute)
+        except Exception as e:
+            print(f"Error moving the camera: {str(e)}")

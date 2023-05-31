@@ -149,7 +149,6 @@ class MainWindow(QWidget):
             camera_data = {"ip": ip_address, "port": 80, "username": username, "password": password}
             if self.saveprefix != "":
                 self.ptz_handler.make_ptz_handler(self, self.saveprefix + ".txt", camera_data)
-                # p = spawn_ffmpeg_process(config["ffmpeg"], config["cam"], config["saveprefix"] + ".mkv")
             else:
                 self.ptz_handler.make_ptz_handler(self,None, camera_data)
 
